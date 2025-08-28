@@ -13,9 +13,13 @@ import {
   IconButton,
   SubNavSections,
   SubNavSection,
+  SubNavLink,
+  SubNavLinkSection,
+  SubNav as DSSubNav,
 } from '@strapi/design-system';
 import { ArrowClockwise, Cross, More, Plus, Search } from '@strapi/icons';
 import { useIntl } from 'react-intl';
+import { NavLink } from 'react-router-dom';
 import { styled } from 'styled-components';
 
 import { getTrad } from '../../utils/getTrad';
@@ -64,7 +68,6 @@ const GuidedTourTooltip = ({
 export const ContentTypeBuilderNav = () => {
   const { menu, search } = useContentTypeBuilderMenu();
   const { saveSchema, isModified, history, isInDevelopmentMode } = useDataManager();
-
   const { formatMessage } = useIntl();
 
   const [menuIsOpen, setMenuIsOpen] = useState(false);
@@ -123,7 +126,7 @@ export const ContentTypeBuilderNav = () => {
   });
 
   return (
-    <SubNav.Main aria-label={pluginName}>
+    <DSSubNav aria-label={pluginName}>
       <SubNav.Header label={pluginName} />
       <Flex
         paddingTop={5}
@@ -268,38 +271,47 @@ export const ContentTypeBuilderNav = () => {
                   const linkLabel = formatMessage({ id: link.name, defaultMessage: link.title });
 
                   if ('links' in link) {
-                    return link.links.map((subLink) => {
-                      const label = formatMessage({
-                        id: subLink.name,
-                        defaultMessage: subLink.title,
-                      });
+                    return (
+                      <SubNavLinkSection key={link.name} label={linkLabel}>
+                        {link.links.map((subLink: any) => {
+                          const label = formatMessage({
+                            id: subLink.name,
+                            defaultMessage: subLink.title,
+                          });
 
-                      return (
-                        <SubNav.Link
-                          to={subLink.to}
-                          key={subLink.name}
-                          label={label}
-                          endAction={
-                            <Box tag="span" textAlign="center" width={'24px'}>
-                              <Status status={subLink.status} />
-                            </Box>
-                          }
-                        />
-                      );
-                    });
+                          return (
+                            <SubNavLink
+                              tag={NavLink}
+                              key={link.name}
+                              to={subLink.to}
+                              endAction={
+                                <Box tag="span" textAlign="center" width={'24px'}>
+                                  <Status status={subLink.status} />
+                                </Box>
+                              }
+                              isSubSectionChild
+                            >
+                              {label}
+                            </SubNavLink>
+                          );
+                        })}
+                      </SubNavLinkSection>
+                    );
                   }
 
                   return (
-                    <SubNav.Link
+                    <SubNavLink
+                      tag={NavLink}
                       to={link.to}
                       key={link.name}
-                      label={linkLabel}
                       endAction={
                         <Box tag="span" textAlign="center" width={'24px'}>
                           <Status status={link.status} />
                         </Box>
                       }
-                    />
+                    >
+                      {linkLabel}
+                    </SubNavLink>
                   );
                 })}
               </SubNavSection>
@@ -318,6 +330,6 @@ export const ContentTypeBuilderNav = () => {
           })}
         </ConfirmDialog>
       </Dialog.Root>
-    </SubNav.Main>
+    </DSSubNav>
   );
 };
